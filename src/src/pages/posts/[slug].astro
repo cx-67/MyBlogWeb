@@ -1,0 +1,75 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { withBase } from '../../lib/url';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts
+    .filter((p) => !p.data.draft)
+    .map((post) => ({
+      params: { slug: post.slug },
+      props: { post },
+    }));
+}
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+}
+const { post } = Astro.props;
+const { data } = post;
+const base = import.meta.env.BASE_URL;
+const { Content } = await post.render();
+---
+
+<BaseLayout title={data.title} description={data.description}>
+  <div class="container container-narrow">
+    <a href={withBase('posts', base)} class="back">← 返回文章</a>
+
+    <article class="post-detail fade-up">
+      <header class="head">
+        <div class="meta">
+          <span>{data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+        </div>
+        <h1>{data.title}</h1>
+        <p class="lead">{data.description}</p>
+        <div class="tags">
+          {data.tags.map((tag, i) => <span class={`tag tag-${(i % 5) + 1}`}>{tag}</span>)}
+        </div>
+      </header>
+
+      <div class="divider"></div>
+
+      <div class="prose">
+        <Content />
+      </div>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .back {
+    display: inline-block;
+    margin-bottom: var(--space-6);
+    font-size: 0.88rem;
+    font-weight: 500;
+  }
+  .head { margin-bottom: var(--space-4); }
+  .meta {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-3);
+  }
+  .lead {
+    font-size: 1.02rem;
+    color: var(--color-text-soft);
+    margin: var(--space-3) 0 var(--space-4);
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+</style>
+
+<link rel="stylesheet" href="/styles/prose.css" />

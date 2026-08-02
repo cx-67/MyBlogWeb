@@ -1,0 +1,246 @@
+/* ==========================================================================
+   简约清新主题 - 全局设计令牌
+   保留多巴胺色系作为点缀，主体以大量留白 + 细线 + 克制配色为主
+   ========================================================================== */
+
+:root {
+  /* 背景色 */
+  --color-bg: #fbfbfa;
+  --color-bg-soft: #f5f5f3;
+  --color-card: #ffffff;
+
+  /* 文字 */
+  --color-text: #1f1f23;
+  --color-text-soft: #5c5c66;
+  --color-text-muted: #9a9aa3;
+
+  /* 点缀色（低饱和，仅用于细节） */
+  --color-pink: #e89aad;
+  --color-yellow: #e8d489;
+  --color-blue: #8fb8d9;
+  --color-mint: #8fcfb6;
+  --color-lilac: #b89ed8;
+  --color-coral: #e8a89c;
+
+  /* 深色版用于文字 */
+  --color-pink-deep: #c46b80;
+  --color-yellow-deep: #a88810;
+  --color-blue-deep: #4a82a8;
+  --color-mint-deep: #3d8a6e;
+  --color-lilac-deep: #7a5dba;
+
+  /* 主强调色（单一，克制） */
+  --color-accent: #6b5b95;       /* 沉静紫，作为主交互色 */
+  --color-accent-soft: #efeaf6;
+
+  /* 边框与阴影 */
+  --color-border: #ececea;
+  --color-border-strong: #d8d8d4;
+  --shadow-soft: 0 1px 3px rgba(31, 31, 35, 0.04);
+  --shadow-hover: 0 6px 20px rgba(31, 31, 35, 0.08);
+  --shadow-card: 0 1px 2px rgba(31, 31, 35, 0.03);
+
+  /* 圆角 */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* 间距 */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* 字体 */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+
+  /* 布局 */
+  --max-width: 920px;
+  --max-width-narrow: 680px;
+
+  /* 过渡 */
+  --transition: 0.2s ease;
+}
+
+/* 基础重置 */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.75;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+img, svg { max-width: 100%; height: auto; display: block; }
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+a:hover { color: var(--color-lilac-deep); }
+
+/* 布局工具 */
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+.container-narrow { max-width: var(--max-width-narrow); }
+main { flex: 1; padding: var(--space-12) 0; }
+
+/* 分隔线（细线，不再彩虹） */
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--space-12) 0;
+}
+
+/* 排版 */
+h1, h2, h3, h4 {
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+h1 { font-size: clamp(1.8rem, 4.5vw, 2.4rem); }
+h2 { font-size: clamp(1.4rem, 3.5vw, 1.7rem); }
+h3 { font-size: 1.15rem; }
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  margin-bottom: var(--space-3);
+}
+
+.section-title { margin-bottom: var(--space-2); }
+.section-desc {
+  color: var(--color-text-soft);
+  margin-bottom: var(--space-8);
+  max-width: 560px;
+  font-size: 0.95rem;
+}
+
+/* 卡片 */
+.card {
+  background: var(--color-card);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  border: 1px solid var(--color-border);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.card:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-hover);
+}
+.card-link { display: block; color: inherit; }
+.card-link:hover { color: inherit; }
+
+/* 标签（默认：灰底，单色统一，不分项区分） */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  background: var(--color-bg-soft);
+  color: var(--color-text-soft);
+  border: 1px solid transparent;
+}
+.tag-current {
+  background: var(--color-text);
+  color: var(--color-bg);
+  border-color: var(--color-text);
+}
+/* 5 色（极淡，仅用于项目/文章卡片做视觉区分；关于页不应用） */
+.tag-1 { background: #f5eef0; color: #a87880; border-color: #ece1e3; }  /* 淡樱粉 */
+.tag-2 { background: #eef3e7; color: #7a9560; border-color: #e0e5d3; }  /* 淡嫩绿 */
+.tag-3 { background: #e9eff4; color: #6b8aa0; border-color: #d8e0e8; }  /* 淡雾蓝 */
+.tag-4 { background: #efeaf3; color: #8a7aa6; border-color: #dcd5e3; }  /* 淡淡紫 */
+.tag-5 { background: #f3ecdf; color: #9a7d50; border-color: #e6dcc9; }  /* 淡暖杏 */
+
+/* 按钮 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition);
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--color-accent);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--color-lilac-deep);
+  color: #fff;
+  transform: none;
+}
+.btn-soft {
+  background: var(--color-card);
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+.btn-soft:hover {
+  background: var(--color-bg-soft);
+  color: var(--color-text);
+  border-color: var(--color-text-muted);
+}
+
+/* 网格 */
+.grid {
+  display: grid;
+  gap: var(--space-5);
+}
+.grid-2 { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+
+/* 渐入动画 */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.5s ease both; }
+
+/* 工具 */
+.text-center { text-align: center; }
+.muted { color: var(--color-text-muted); }
+.mono { font-family: var(--font-mono); }
+
+@media (max-width: 640px) {
+  :root {
+    --space-12: 2rem;
+    --space-16: 2.5rem;
+    --space-20: 3rem;
+  }
+  .container { padding: 0 var(--space-4); }
+  body { font-size: 14px; }
+}

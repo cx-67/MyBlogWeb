@@ -1,0 +1,129 @@
+---
+import { getCollection } from 'astro:content';
+import { withBase } from '../lib/url';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import PostCard from '../components/PostCard.astro';
+
+const base = import.meta.env.BASE_URL;
+
+const projects = (await getCollection('projects')).sort((a, b) => b.data.order - a.data.order);
+const featuredProjects = projects.filter((p) => p.data.featured).slice(0, 3);
+const showFeatured = featuredProjects.length > 0 ? featuredProjects : projects.slice(0, 3);
+
+const posts = (await getCollection('posts'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 3);
+
+const allTags = [...new Set(projects.flatMap((p) => p.data.tags))].slice(0, 8);
+---
+
+<BaseLayout title="成馨 · 作品集">
+    <!-- Hero（简约版，无渐变球） -->
+    <section class="hero fade-up">
+      <div class="container">
+        <p class="hero-eyebrow">成馨 · 南京大学软件工程</p>
+        <h1 class="hero-title">
+          用代码搭后端，<br />用方法论讲方案。
+        </h1>
+        <p class="hero-desc">
+          既能独立交付千行级别的后端代码，也能用商业模式画布把需求讲清楚。沉迷 LLM 工程化（ReAct / RAG / Agent）。秋招方向：后端开发 / AI 应用 / 售前解决方案。
+        </p>
+        <div class="hero-actions">
+          <a href={withBase('projects', base)} class="btn btn-primary">查看项目</a>
+          <a href={withBase('about', base)} class="btn btn-soft">关于我</a>
+        </div>
+      </div>
+    </section>
+
+  <div class="container">
+    <!-- 技术栈 -->
+    {allTags.length > 0 && (
+      <section class="section fade-up">
+        <p class="eyebrow">技术栈</p>
+        <div class="tag-row">
+          {allTags.map((tag, i) => <span class={`tag tag-${(i % 5) + 1}`}>{tag}</span>)}
+        </div>
+      </section>
+    )}
+
+    <div class="divider"></div>
+
+    <!-- 精选项目 -->
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">项目</p>
+          <h2 class="section-title">精选项目</h2>
+        </div>
+        <a href={withBase('projects', base)} class="more-link">全部 →</a>
+      </div>
+      <div class="grid grid-2">
+        {showFeatured.map((project) => <ProjectCard project={project} />)}
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- 最新文章 -->
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">文章</p>
+          <h2 class="section-title">最新文章</h2>
+        </div>
+        <a href={withBase('posts', base)} class="more-link">全部 →</a>
+      </div>
+      <div class="grid grid-2">
+        {posts.map((post) => <PostCard post={post} />)}
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding: var(--space-16) 0 var(--space-12);
+  }
+  .hero-eyebrow {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+    font-weight: 500;
+  }
+  .hero-title {
+    margin-bottom: var(--space-5);
+    font-weight: 600;
+  }
+  .hero-desc {
+    font-size: 1rem;
+    color: var(--color-text-soft);
+    margin-bottom: var(--space-8);
+    max-width: 560px;
+  }
+  .hero-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+  .section { margin-bottom: var(--space-4); }
+  .section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: var(--space-6);
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+  .more-link {
+    font-size: 0.88rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>

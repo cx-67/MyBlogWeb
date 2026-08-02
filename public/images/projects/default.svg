@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225">
+  <defs>
+    <linearGradient id="gd" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff4f7"/>
+      <stop offset="100%" stop-color="#f0f8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="225" fill="url(#gd)"/>
+  <text x="200" y="120" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="18" fill="#cdb4f6">封面图占位</text>
+</svg>

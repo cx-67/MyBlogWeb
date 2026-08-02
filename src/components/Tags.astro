@@ -1,0 +1,37 @@
+---
+import { tagClass } from '../lib/tags';
+
+interface Props {
+  tags: string[];
+  interactive?: boolean;
+  activeTag?: string;
+  hrefPrefix?: string;
+}
+const { tags = [], interactive = false, activeTag = '', hrefPrefix = '' } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<div class="tags">
+  {tags.map((tag) => {
+    const cls = tagClass(tag, interactive ? 'tag-interactive' : '');
+    if (interactive && hrefPrefix) {
+      const href = `${base}${hrefPrefix}?tag=${encodeURIComponent(tag)}`;
+      return (
+        <a href={href} class:list={[cls, { active: activeTag === tag }]}>{tag}</a>
+      );
+    }
+    return <span class={cls}>{tag}</span>;
+  })}
+</div>
+
+<style>
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .tag.active {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
+  }
+</style>

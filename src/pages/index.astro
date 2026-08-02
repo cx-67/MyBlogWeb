@@ -1,0 +1,215 @@
+---
+import { getCollection } from 'astro:content';
+import { withBase } from '../lib/url';
+import { tagClass } from '../lib/tags';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import PostCard from '../components/PostCard.astro';
+import StarBackground from '../components/StarBackground.astro';
+import ScrollReveal from '../components/ScrollReveal.astro';
+
+const base = import.meta.env.BASE_URL;
+
+const projects = (await getCollection('projects')).sort((a, b) => b.data.order - a.data.order);
+const featuredProjects = projects.filter((p) => p.data.featured).slice(0, 3);
+const showFeatured = featuredProjects.length > 0 ? featuredProjects : projects.slice(0, 3);
+
+const posts = (await getCollection('posts'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 3);
+
+const allTags = [...new Set(projects.flatMap((p) => p.data.tags))].slice(0, 8);
+---
+
+<BaseLayout title="成馨 · 作品集">
+  <ScrollReveal />
+
+  <!-- Hero -->
+  <section class="hero">
+    <StarBackground />
+    <div class="container hero-inner">
+      <h1 class="hero-title">
+        <span class="hero-name">成馨 · 南京大学软件工程</span><br />
+        <span id="hero-typewriter" data-text="用代码搭后端，用方法论讲方案。" data-speed="70" data-delay="300"></span>
+        <span class="typewriter-cursor">|</span>
+      </h1>
+      <p class="hero-desc reveal">
+        既能独立交付千行级别的后端代码，也能用商业模式画布把需求讲清楚。
+      </p>
+      <p class="hero-aside reveal reveal-delay-1">沉迷 LLM 工程化（ReAct / RAG / Agent）</p>
+      <div class="hero-actions reveal reveal-delay-2">
+        <a href={withBase('projects', base)} class="btn btn-primary">查看项目 →</a>
+        <a href={withBase('about', base)} class="btn btn-soft">关于我</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <!-- 技术栈 -->
+    {allTags.length > 0 && (
+      <section class="section tech-section reveal">
+        <p class="eyebrow">技术栈</p>
+        <div class="tag-cloud">
+          {allTags.map((tag, i) => <span class={`${tagClass(tag)} reveal reveal-delay-${(i % 4) + 1}`}>{tag}</span>)}
+        </div>
+      </section>
+    )}
+
+    <div class="divider reveal"></div>
+
+    <!-- 精选项目 -->
+    <section class="section">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">项目</p>
+          <h2 class="section-title">精选项目</h2>
+        </div>
+        <a href={withBase('projects', base)} class="more-link">全部 →</a>
+      </div>
+      <div class="grid grid-2">
+        {showFeatured.map((project, i) => (
+          <div class={`reveal reveal-delay-${(i % 3) + 1}`}>
+            <ProjectCard project={project} />
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <div class="divider reveal"></div>
+
+    <!-- 最新文章 -->
+    <section class="section">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">文章</p>
+          <h2 class="section-title">最新文章</h2>
+        </div>
+        <a href={withBase('posts', base)} class="more-link">全部 →</a>
+      </div>
+      <div class="grid grid-2">
+        {posts.map((post, i) => (
+          <div class={`reveal reveal-delay-${(i % 3) + 1}`}>
+            <PostCard post={post} />
+          </div>
+        ))}
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  // 打字机效果
+  (function() {
+    const el = document.getElementById('hero-typewriter');
+    if (!el) return;
+    const fullText = el.dataset.text || '';
+    const speed = parseInt(el.dataset.speed || '70', 10);
+    const delay = parseInt(el.dataset.delay || '300', 10);
+    let i = 0;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = fullText;
+      return;
+    }
+
+    function type() {
+      if (i < fullText.length) {
+        el.textContent += fullText.charAt(i);
+        i++;
+        setTimeout(type, speed + (Math.random() * 40 - 20));
+      }
+    }
+
+    setTimeout(type, delay);
+  })();
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    padding: var(--space-20) 0 var(--space-12);
+    overflow: hidden;
+  }
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .hero-title {
+    display: inline-block;
+    margin: 0 0 var(--space-5);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-align: center;
+    line-height: 1.25;
+  }
+  .hero-name {
+    display: block;
+    font-size: 0.6em;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    letter-spacing: 0.02em;
+    margin-bottom: 0.25em;
+  }
+  .typewriter-cursor {
+    display: inline-block;
+    animation: blink 1s step-end infinite;
+    color: var(--color-accent);
+    font-weight: 300;
+    margin-left: 1px;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  .hero-desc {
+    font-size: 1.05rem;
+    color: var(--color-text-soft);
+    margin: 0 0 var(--space-3);
+    max-width: 560px;
+  }
+  .hero-aside {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-8);
+    max-width: 560px;
+  }
+  .hero-actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .tech-section { text-align: center; }
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .section { margin-bottom: var(--space-4); }
+  .section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: var(--space-6);
+  }
+  .more-link {
+    font-size: 0.88rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .hero { padding: var(--space-16) 0 var(--space-8); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .typewriter-cursor { animation: none; opacity: 0; }
+  }
+</style>

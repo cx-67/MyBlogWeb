@@ -1,0 +1,76 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { withBase } from '../lib/url';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+const { project } = Astro.props;
+const { data } = project;
+const base = import.meta.env.BASE_URL;
+const href = withBase(`projects/${project.slug}`, base);
+---
+
+<a href={href} class="card card-link project-card fade-up">
+  <div class="meta">
+    <span class="date">{data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'short' })}</span>
+    <span class="sep">·</span>
+    <span class="role">{data.role}</span>
+  </div>
+  <h3 class="title">{data.title}</h3>
+  <p class="desc">{data.description}</p>
+  <div class="tags">
+    {data.tags.slice(0, 5).map((tag, i) => <span class={`tag tag-${(i % 5) + 1}`}>{tag}</span>)}
+  </div>
+  <div class="links">
+    {data.liveUrl && <span class="link-badge">线上</span>}
+    {data.repoUrl && <span class="link-badge">源码</span>}
+    {data.documents?.length > 0 && <span class="link-badge">文档</span>}
+    {data.externalDocs?.length > 0 && <span class="link-badge">飞书</span>}
+  </div>
+</a>
+
+<style>
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .meta {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sep { opacity: 0.6; }
+  .title {
+    font-size: 1.1rem;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+  .desc {
+    color: var(--color-text-soft);
+    font-size: 0.88rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: var(--space-1);
+  }
+  .links {
+    display: flex;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: var(--space-2);
+  }
+  .link-badge {
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+  }
+</style>

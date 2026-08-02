@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225">
+  <defs>
+    <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#c7e9ff"/>
+      <stop offset="100%" stop-color="#a8e6cf"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="225" fill="url(#g2)"/>
+  <circle cx="70" cy="60" r="35" fill="#cdb4f6" opacity="0.7"/>
+  <circle cx="340" cy="170" r="28" fill="#ff9eb5" opacity="0.7"/>
+  <text x="200" y="125" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="20" font-weight="700" fill="#fff">AI Tutor</text>
+</svg>

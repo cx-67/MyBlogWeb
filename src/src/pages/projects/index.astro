@@ -1,0 +1,63 @@
+---
+import { getCollection } from 'astro:content';
+import { withBase } from '../../lib/url';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+
+const base = import.meta.env.BASE_URL;
+const url = new URL(Astro.request.url);
+const activeTag = url.searchParams.get('tag') || '';
+
+const allProjects = await getCollection('projects');
+let projects = allProjects.sort((a, b) => b.data.order - a.data.order);
+if (activeTag) {
+  projects = projects.filter((p) => p.data.tags.includes(activeTag));
+}
+const allTags = [...new Set(allProjects.flatMap((p) => p.data.tags))].sort();
+---
+
+<BaseLayout title="项目" description="成馨的项目作品集与研究">
+  <div class="container">
+    <div class="page-head fade-up">
+      <p class="eyebrow">项目</p>
+      <h1>项目</h1>
+      <p class="section-desc">
+        个人项目、课程设计与行业研究。每个项目都包含背景、技术架构与核心亮点。
+      </p>
+    </div>
+
+    <!-- 标签云（不可点击，仅作图例区分） -->
+    <div class="tag-cloud fade-up">
+      <span class="tag tag-current">全部</span>
+      {allTags.map((tag, i) => <span class={`tag tag-${(i % 5) + 1}`}>{tag}</span>)}
+    </div>
+
+    <p class="count muted">共 {projects.length} 个项目</p>
+
+    <div class="grid grid-2">
+      {projects.map((project) => <ProjectCard project={project} />)}
+    </div>
+
+    {projects.length === 0 && (
+      <div class="empty">
+        <p class="muted">没有符合该标签的项目。</p>
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head { margin-bottom: var(--space-8); }
+  .page-head h1 { margin: var(--space-1) 0 var(--space-4); }
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: var(--space-4);
+  }
+  .count { font-size: 0.82rem; margin-bottom: var(--space-6); }
+  .empty {
+    text-align: center;
+    padding: var(--space-16);
+  }
+</style>

@@ -1,0 +1,153 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { withBase, assetUrl } from '../../lib/url';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+const { project } = Astro.props;
+const { data } = project;
+const base = import.meta.env.BASE_URL;
+const { Content } = await project.render();
+---
+
+<BaseLayout title={data.title} description={data.description}>
+  <div class="container container-narrow">
+    <a href={withBase('projects', base)} class="back">← 返回项目</a>
+
+    <article class="project-detail fade-up">
+      <header class="head">
+        <div class="meta">
+          <span>{data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long' })}</span>
+          <span class="sep">·</span>
+          <span>{data.role}</span>
+        </div>
+        <h1>{data.title}</h1>
+        <p class="lead">{data.description}</p>
+        <div class="tags">
+          {data.tags.map((tag, i) => <span class={`tag tag-${(i % 5) + 1}`}>{tag}</span>)}
+        </div>
+      </header>
+
+      <div class="actions">
+        {data.liveUrl && <a href={data.liveUrl} target="_blank" rel="noopener" class="btn btn-primary">访问线上</a>}
+        {data.repoUrl && <a href={data.repoUrl} target="_blank" rel="noopener" class="btn btn-soft">查看源码</a>}
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="prose">
+        <Content />
+      </div>
+
+      {data.documents && data.documents.length > 0 && (
+        <section class="docs">
+          <h3>相关文档</h3>
+          <div class="doc-list">
+            {data.documents.map((doc) => (
+              <a href={assetUrl(doc.path, base)} class="doc-item" download>
+                <span class="doc-name">{doc.name}</span>
+                <span class="doc-arrow">↓</span>
+              </a>
+            ))}
+          </div>
+          <p class="muted doc-tip">文档托管于 GitHub Pages 静态资源。</p>
+        </section>
+      )}
+
+      {data.externalDocs && data.externalDocs.length > 0 && (
+        <section class="docs">
+          <h3>外部链接</h3>
+          <div class="doc-list">
+            {data.externalDocs.map((doc) => (
+              <a href={doc.url} target="_blank" rel="noopener" class="doc-item external">
+                <span class="doc-name">{doc.name}</span>
+                <span class="doc-arrow">↗</span>
+              </a>
+            ))}
+          </div>
+          <p class="muted doc-tip">外部链接，如飞书 Wiki、在线文档等。</p>
+        </section>
+      )}
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .back {
+    display: inline-block;
+    margin-bottom: var(--space-6);
+    font-size: 0.88rem;
+    font-weight: 500;
+  }
+  .head { margin-bottom: var(--space-6); }
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-3);
+    flex-wrap: wrap;
+  }
+  .sep { opacity: 0.6; }
+  .lead {
+    font-size: 1.02rem;
+    color: var(--color-text-soft);
+    margin: var(--space-3) 0 var(--space-4);
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin: var(--space-6) 0;
+  }
+  .docs {
+    margin-top: var(--space-12);
+    padding: var(--space-6);
+    background: var(--color-bg-soft);
+    border-radius: var(--radius-md);
+  }
+  .docs h3 { margin-bottom: var(--space-4); }
+  .doc-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+  .doc-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: inherit;
+    font-size: 0.9rem;
+    transition: border-color var(--transition);
+  }
+  .doc-item:hover {
+    color: inherit;
+    border-color: var(--color-border-strong);
+  }
+  .doc-name { font-weight: 500; }
+  .doc-arrow { color: var(--color-accent); font-weight: 600; }
+  .doc-tip { font-size: 0.78rem; }
+</style>
+
+<link rel="stylesheet" href="/styles/prose.css" />

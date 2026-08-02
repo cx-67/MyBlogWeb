@@ -1,0 +1,170 @@
+---
+// 粒子网络背景组件
+// 使用 Canvas 2D 渲染，轻量高性能
+---
+
+<canvas id="particle-canvas" class="particle-canvas"></canvas>
+
+<script>
+  (function() {
+    const canvas = document.getElementById('particle-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let animationId = null;
+    let isActive = true;
+
+    // 配置参数
+    const config = {
+      particleCount: 40,      // 粒子数量（克制，不喧宾夺主）
+      connectionDistance: 120, // 连线最大距离
+      mouseDistance: 150,      // 鼠标交互距离
+      speed: 0.3,            // 粒子速度
+      particleColor: 'rgba(107, 91, 149, 0.25)', // 淡紫色，与主题 accent 呼应
+      lineColor: 'rgba(107, 91, 149, 0.08)',     // 更淡的连线
+      mouseColor: 'rgba(107, 91, 149, 0.15)',
+    };
+
+    let mouse = { x: null, y: null };
+    let dpr = window.devicePixelRatio || 1;
+
+    function resize() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+      ctx.scale(dpr, dpr);
+    }
+
+    class Particle {
+      constructor(w, h) {
+        this.x = Math.random() * w;
+        this.y = Math.random() * h;
+        this.vx = (Math.random() - 0.5) * config.speed * 2;
+        this.vy = (Math.random() - 0.5) * config.speed * 2;
+        this.radius = Math.random() * 1.5 + 0.5;
+      }
+      update(w, h) {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > w) this.vx *= -1;
+        if (this.y < 0 || this.y > h) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = config.particleColor;
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      const w = canvas.width / dpr;
+      const h = canvas.height / dpr;
+      particles = [];
+      for (let i = 0; i < config.particleCount; i++) {
+        particles.push(new Particle(w, h));
+      }
+    }
+
+    function drawLines() {
+      const w = canvas.width / dpr;
+      const h = canvas.height / dpr;
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < config.connectionDistance) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = config.lineColor;
+            ctx.lineWidth = 0.5 * (1 - dist / config.connectionDistance);
+            ctx.stroke();
+          }
+        }
+        // 鼠标连线
+        if (mouse.x !== null && mouse.y !== null) {
+          const dx = particles[i].x - mouse.x;
+          const dy = particles[i].y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < config.mouseDistance) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.strokeStyle = config.mouseColor;
+            ctx.lineWidth = 0.3 * (1 - dist / config.mouseDistance);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    function animate() {
+      if (!isActive) return;
+      const w = canvas.width / dpr;
+      const h = canvas.height / dpr;
+      ctx.clearRect(0, 0, w, h);
+      particles.forEach(p => {
+        p.update(w, h);
+        p.draw();
+      });
+      drawLines();
+      animationId = requestAnimationFrame(animate);
+    }
+
+    // 事件监听
+    function onMouseMove(e) {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    }
+    function onMouseLeave() {
+      mouse.x = null;
+      mouse.y = null;
+    }
+    function onResize() {
+      resize();
+      initParticles();
+    }
+
+    canvas.addEventListener('mousemove', onMouseMove);
+    canvas.addEventListener('mouseleave', onMouseLeave);
+    window.addEventListener('resize', onResize);
+
+    // 可见性控制（性能优化）
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        isActive = false;
+        if (animationId) cancelAnimationFrame(animationId);
+      } else {
+        isActive = true;
+        animate();
+      }
+    });
+
+    // 减少动画偏好支持
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      isActive = false;
+      return;
+    }
+
+    resize();
+    initParticles();
+    animate();
+  })();
+</script>
+
+<style>
+  .particle-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: auto; /* 允许鼠标交互 */
+    z-index: 0;
+  }
+</style>

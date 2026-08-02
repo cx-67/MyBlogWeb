@@ -1,0 +1,149 @@
+---
+import { withBase } from '../lib/url';
+const { pathname } = Astro.url;
+const base = import.meta.env.BASE_URL;
+
+const isActive = (href: string) => {
+  const full = withBase(href, base).replace(/\/+$/, '') || '/';
+  const cur = pathname.replace(/\/+$/, '') || '/';
+  // 首页：精确匹配根（避免 /projects 也命中 /MyBlogWeb）
+  if (full === withBase('', base).replace(/\/+$/, '')) {
+    return cur === full;
+  }
+  return cur === full || cur.startsWith(full + '/');
+};
+
+const navItems = [
+  { href: '', label: '首页' },
+  { href: 'projects', label: '项目' },
+  { href: 'posts', label: '文章' },
+  { href: 'about', label: '关于' },
+];
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href={withBase('', base)} class="logo" aria-label="首页">
+      <span class="logo-dot"></span>
+      <span class="logo-text">成馨</span>
+    </a>
+
+    <nav class="nav" aria-label="主导航">
+      {navItems.map((item) => (
+        <a
+          href={withBase(item.href, base)}
+          class:list={['nav-link', { active: isActive(item.href) }]}
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <button class="nav-toggle" aria-label="菜单" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-text);
+    letter-spacing: 0.02em;
+  }
+  .logo:hover { color: var(--color-text); }
+
+  .logo-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-lilac-deep);
+  }
+
+  .nav {
+    display: flex;
+    gap: 2px;
+  }
+
+  .nav-link {
+    font-size: 0.92rem;
+    color: var(--color-text-soft);
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition);
+  }
+  .nav-link:hover {
+    color: var(--color-text);
+    background: var(--color-bg-soft);
+  }
+  .nav-link.active {
+    color: var(--color-text);
+    font-weight: 600;
+    background: var(--color-bg-soft);
+  }
+
+  .nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .nav-toggle span {
+    width: 20px;
+    height: 2px;
+    background: var(--color-text);
+    border-radius: 2px;
+  }
+
+  @media (max-width: 640px) {
+    .nav { display: none; }
+    .nav.open {
+      display: flex;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      background: var(--color-bg);
+      padding: var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+      gap: 2px;
+    }
+    .nav.open .nav-link { padding: 10px 14px; }
+    .nav-toggle { display: flex; }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector('.nav-toggle');
+  const nav = document.querySelector('.nav');
+  toggle?.addEventListener('click', () => {
+    const open = nav?.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(!!open));
+  });
+</script>
