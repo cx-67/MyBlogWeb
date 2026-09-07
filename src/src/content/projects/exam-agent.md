@@ -9,8 +9,8 @@ date: 2026-03-01
 featured: true
 repoUrl: "https://github.com/cx-67/smart-exam-agent"
 documents:
-  - name: "后端简历.docx"
-    path: "/files/resume-backend.docx"
+  - name: "Agent 开发简历.pdf"
+    path: "/files/resume-agent.pdf"
 order: 100
 ---
 
